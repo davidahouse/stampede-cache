@@ -5,6 +5,12 @@ let client
 
 // Public functions
 
+// General
+
+/**
+ * startCache
+ * @param {*} conf 
+ */
 function startCache(conf) {
   client = createRedisClient(conf)
   client.on('error', function(err) {
@@ -12,6 +18,30 @@ function startCache(conf) {
   })
 }
 
+// Tasks
+
+/**
+ * fetchTasks
+ */
+async function fetchTasks() {
+  let tasks = await fetchMembers('stampede-tasks')
+  return tasks
+}
+
+/**
+ * fetchTaskConfig
+ * @param {*} id 
+ * @return {Object} task config
+ */
+async function fetchTaskConfig(id) {
+  let config = await fetch('stampede-tasks-' + id)
+  return config
+}
+
+/**
+ * storeTaskConfig
+ * @param {*} tasks 
+ */
 async function storeTaskConfig(tasks) {
   for (let index = 0; index < tasks.length; index++) {
     await add('stampede-tasks', tasks[index].id)
@@ -19,35 +49,55 @@ async function storeTaskConfig(tasks) {
   }
 }
 
-async function fetchTasks() {
-  let tasks = await fetchMembers('stampede-tasks')
-  return tasks
+/**
+ * addTaskToActiveList
+ * @param {*} task 
+ */
+async function addTaskToActiveList(task) {
+  await add('stampede-activetasks', task)
 }
 
-async function fetchTaskConfig(id) {
-  let config = await fetch('stampede-task-' + id)
-  return config
-}
+// Repo Config
 
+/**
+ * fetchRepoConfig
+ * @param {*} owner 
+ * @param {*} repo 
+ * @return {Object} config
+ */
 async function fetchRepoConfig(owner, repo) {
   let config = await fetch('stampede-' + owner + '-' + repo + '-config')
   return config
 }
 
+/**
+ * storeRepoConfig
+ * @param {*} owner 
+ * @param {*} repo 
+ * @param {*} config 
+ */
+async function storeRepoConfig(owner, repo, config) {
+  await store('stampede-' + owner + '-' + repo + '-config', config)
+}
+
+// Builds
+
+/**
+ * incrementBuildNumber
+ * @param {*} buildPath 
+ */
 async function incrementBuildNumber(buildPath) {
   const buildNumber = await increment('stampede-' + buildPath)
   return buildNumber
 }
 
+/**
+ * addBuildToActiveList
+ * @param {*} build 
+ */
 async function addBuildToActiveList(build) {
   await add('stampede-activebuilds', build)
 }
-
-async function addTaskToActiveList(task) {
-  await add('stampede-activetasks', task)
-}
-
-
 
 // Private functions
 
@@ -127,11 +177,19 @@ async function fetchMembers(key, defaultValue) {
   }
 }
 
+// General
 module.exports.startCache = startCache
-module.exports.storeTaskConfig = storeTaskConfig
+
+// Tasks
 module.exports.fetchTasks = fetchTasks
-module.exports.fetchRepoConfig = fetchRepoConfig
-module.exports.incrementBuildNumber = incrementBuildNumber
 module.exports.fetchTaskConfig = fetchTaskConfig
-module.exports.addBuildToActiveList = addBuildToActiveList
+module.exports.storeTaskConfig = storeTaskConfig
 module.exports.addTaskToActiveList = addTaskToActiveList
+
+// Repo config
+module.exports.fetchRepoConfig = fetchRepoConfig
+module.exports.storeRepoConfig = storeRepoConfig
+
+// Builds
+module.exports.incrementBuildNumber = incrementBuildNumber
+module.exports.addBuildToActiveList = addBuildToActiveList
