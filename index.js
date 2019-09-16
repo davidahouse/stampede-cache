@@ -49,14 +49,6 @@ async function storeTaskConfig(tasks) {
   }
 }
 
-/**
- * addTaskToActiveList
- * @param {*} task 
- */
-async function addTaskToActiveList(task) {
-  await add('stampede-activetasks', task)
-}
-
 // Repo Config
 
 /**
@@ -92,12 +84,56 @@ async function incrementBuildNumber(buildPath) {
 }
 
 /**
+ * fetchActiveBuilds
+ */
+async function fetchActiveBuilds() {
+  const builds = await fetchMembers('stampede-activebuilds')
+  return builds
+}
+
+/**
  * addBuildToActiveList
  * @param {*} build 
  */
 async function addBuildToActiveList(build) {
   await add('stampede-activebuilds', build)
 }
+
+/**
+ * removeBuildFromActiveList
+ * @param {*} build
+ */
+async function removeBuildFromActiveList(build) {
+  await removeMember('stampede-activebuilds', build)
+}
+
+/**
+ * Fetch active tasks
+ * @param {*} build 
+ */
+async function fetchActiveTasks(build) {
+  const tasks = await fetchMembers('stampede-' + build)
+  return tasks
+}
+
+/**
+ * addTaskToActiveList
+ * @param {*} build
+ * @param {*} task 
+ */
+async function addTaskToActiveList(build, task) {
+  await add('stampede-' + build, task)
+}
+
+/**
+ * removeTaskFromActiveList
+ * @param {*} build
+ * @param {*} task
+ */
+async function removeTaskFromActiveList(build, task) {
+  await removeMember('stampede-' + build, task)
+}
+
 
 // Private functions
 
@@ -147,6 +183,14 @@ async function remove(key) {
   }
 }
 
+async function removeMember(key, value) {
+  try {
+    await client.srem(key, value)
+  } catch (e) {
+    console.log('Error removing ' + key + ': ' + value + ': ' + e)
+  }
+}
+
 async function fetch(key, defaultValue) {
   console.log('-- Fetching: ' + key)
   try {
@@ -184,7 +228,6 @@ module.exports.startCache = startCache
 module.exports.fetchTasks = fetchTasks
 module.exports.fetchTaskConfig = fetchTaskConfig
 module.exports.storeTaskConfig = storeTaskConfig
-module.exports.addTaskToActiveList = addTaskToActiveList
 
 // Repo config
 module.exports.fetchRepoConfig = fetchRepoConfig
@@ -192,4 +235,9 @@ module.exports.storeRepoConfig = storeRepoConfig
 
 // Builds
 module.exports.incrementBuildNumber = incrementBuildNumber
+module.exports.fetchActiveBuilds = fetchActiveBuilds
 module.exports.addBuildToActiveList = addBuildToActiveList
+module.exports.removeBuildFromActiveList = removeBuildFromActiveList
+module.exports.fetchActiveTasks = fetchActiveTasks
+module.exports.addTaskToActiveList = addTaskToActiveList
+module.exports.removeTaskFromActiveList = removeTaskFromActiveList
