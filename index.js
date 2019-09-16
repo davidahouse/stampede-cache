@@ -9,7 +9,7 @@ let client
 
 /**
  * startCache
- * @param {*} conf 
+ * @param {*} conf
  */
 function startCache(conf) {
   client = createRedisClient(conf)
@@ -24,23 +24,23 @@ function startCache(conf) {
  * fetchTasks
  */
 async function fetchTasks() {
-  let tasks = await fetchMembers('stampede-tasks')
+  const tasks = await fetchMembers('stampede-tasks')
   return tasks
 }
 
 /**
  * fetchTaskConfig
- * @param {*} id 
+ * @param {*} id
  * @return {Object} task config
  */
 async function fetchTaskConfig(id) {
-  let config = await fetch('stampede-tasks-' + id)
+  const config = await fetch('stampede-tasks-' + id)
   return config
 }
 
 /**
  * storeTaskConfig
- * @param {*} tasks 
+ * @param {*} tasks
  */
 async function storeTaskConfig(tasks) {
   for (let index = 0; index < tasks.length; index++) {
@@ -53,20 +53,20 @@ async function storeTaskConfig(tasks) {
 
 /**
  * fetchRepoConfig
- * @param {*} owner 
- * @param {*} repo 
+ * @param {*} owner
+ * @param {*} repo
  * @return {Object} config
  */
 async function fetchRepoConfig(owner, repo) {
-  let config = await fetch('stampede-' + owner + '-' + repo + '-config')
+  const config = await fetch('stampede-' + owner + '-' + repo + '-config')
   return config
 }
 
 /**
  * storeRepoConfig
- * @param {*} owner 
- * @param {*} repo 
- * @param {*} config 
+ * @param {*} owner
+ * @param {*} repo
+ * @param {*} config
  */
 async function storeRepoConfig(owner, repo, config) {
   await store('stampede-' + owner + '-' + repo + '-config', config)
@@ -76,7 +76,7 @@ async function storeRepoConfig(owner, repo, config) {
 
 /**
  * incrementBuildNumber
- * @param {*} buildPath 
+ * @param {*} buildPath
  */
 async function incrementBuildNumber(buildPath) {
   const buildNumber = await increment('stampede-' + buildPath)
@@ -93,7 +93,7 @@ async function fetchActiveBuilds() {
 
 /**
  * addBuildToActiveList
- * @param {*} build 
+ * @param {*} build
  */
 async function addBuildToActiveList(build) {
   await add('stampede-activebuilds', build)
@@ -109,7 +109,7 @@ async function removeBuildFromActiveList(build) {
 
 /**
  * Fetch active tasks
- * @param {*} build 
+ * @param {*} build
  */
 async function fetchActiveTasks(build) {
   const tasks = await fetchMembers('stampede-' + build)
@@ -119,7 +119,7 @@ async function fetchActiveTasks(build) {
 /**
  * addTaskToActiveList
  * @param {*} build
- * @param {*} task 
+ * @param {*} task
  */
 async function addTaskToActiveList(build, task) {
   await add('stampede-' + build, task)
