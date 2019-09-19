@@ -72,6 +72,24 @@ async function storeRepoConfig(owner, repo, config) {
   await store('stampede-' + owner + '-' + repo + '-config', config)
 }
 
+// System level config
+
+/**
+ * storeSystemDefaults
+ * @param {*} defaults 
+ */
+async function storeSystemDefaults(defaults) {
+  await store('stampede-config-defaults', defaults)
+}
+
+/**
+ * storeSystemOverrides
+ * @param {*} overrides 
+ */
+async function storeSystemOverrides(overrides) {
+  await store('stampede-config-overrides', overrides)
+}
+
 // Builds
 
 /**
@@ -232,6 +250,10 @@ module.exports.storeTaskConfig = storeTaskConfig
 // Repo config
 module.exports.fetchRepoConfig = fetchRepoConfig
 module.exports.storeRepoConfig = storeRepoConfig
+
+// System config
+module.exports.storeSystemDefaults = storeSystemDefaults
+module.exports.storeSystemOverrides = storeSystemOverrides
 
 // Builds
 module.exports.incrementBuildNumber = incrementBuildNumber

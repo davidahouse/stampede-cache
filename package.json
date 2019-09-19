@@ -1,6 +1,6 @@
 {
   "name": "stampede-cache",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Shared cache code between stampede apps",
   "license": "MIT",
   "repository": "davidahouse/stampede-cache",
