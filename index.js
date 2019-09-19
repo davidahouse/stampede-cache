@@ -83,11 +83,29 @@ async function storeSystemDefaults(defaults) {
 }
 
 /**
+ * fetchSystemDefaults
+ * @return {*} defaults
+ */
+async function fetchSystemDefaults() {
+  const defaults = await fetch('stampede-config-defaults')
+  return defaults
+}
+
+/**
  * storeSystemOverrides
  * @param {*} overrides 
  */
 async function storeSystemOverrides(overrides) {
   await store('stampede-config-overrides', overrides)
+}
+
+/**
+ * fetchSystemOverrides
+ * @return {*} overrides 
+ */
+async function fetchSystemOverrides() {
+  const overrides = await fetch('stampede-config-overrides')
+  return overrides
 }
 
 // Builds
@@ -254,6 +272,8 @@ module.exports.storeRepoConfig = storeRepoConfig
 // System config
 module.exports.storeSystemDefaults = storeSystemDefaults
 module.exports.storeSystemOverrides = storeSystemOverrides
+module.exports.fetchSystemDefaults = fetchSystemDefaults
+module.exports.fetchSystemOverrides = fetchSystemOverrides
 
 // Builds
 module.exports.incrementBuildNumber = incrementBuildNumber
