@@ -1,16 +1,18 @@
 pullrequests:
   config:
   tasks:
-    - id: lint-node-js
+    - id: lint-nodejs
     - id: unit-tests-nodejs
     - id: pr-standards
+      config:
+        prMilestoneCheck: true
 branches:
-  - branch: master
+  master:
     config:
     tasks:
       - id: unit-tests-nodejs
 releases:
-  config:
-    npm-package: stampede-cache
-  tasks:
-    - id: deploy-npm-package
+  published:
+    tasks:
+      - id: release-notes
+      - id: npm-publish
