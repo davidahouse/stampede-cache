@@ -9,7 +9,7 @@ let client
 
 /**
  * startCache
- * @param {*} conf 
+ * @param {*} conf
  */
 function startCache(conf) {
   client = createRedisClient(conf)
@@ -24,23 +24,23 @@ function startCache(conf) {
  * fetchTasks
  */
 async function fetchTasks() {
-  let tasks = await fetchMembers('stampede-tasks')
+  const tasks = await fetchMembers('stampede-tasks')
   return tasks
 }
 
 /**
  * fetchTaskConfig
- * @param {*} id 
+ * @param {*} id
  * @return {Object} task config
  */
 async function fetchTaskConfig(id) {
-  let config = await fetch('stampede-tasks-' + id)
+  const config = await fetch('stampede-tasks-' + id)
   return config
 }
 
 /**
  * storeTaskConfig
- * @param {*} tasks 
+ * @param {*} tasks
  */
 async function storeTaskConfig(tasks) {
   for (let index = 0; index < tasks.length; index++) {
@@ -53,20 +53,20 @@ async function storeTaskConfig(tasks) {
 
 /**
  * fetchRepoConfig
- * @param {*} owner 
- * @param {*} repo 
+ * @param {*} owner
+ * @param {*} repo
  * @return {Object} config
  */
 async function fetchRepoConfig(owner, repo) {
-  let config = await fetch('stampede-' + owner + '-' + repo + '-config')
+  const config = await fetch('stampede-' + owner + '-' + repo + '-config')
   return config
 }
 
 /**
  * storeRepoConfig
- * @param {*} owner 
- * @param {*} repo 
- * @param {*} config 
+ * @param {*} owner
+ * @param {*} repo
+ * @param {*} config
  */
 async function storeRepoConfig(owner, repo, config) {
   await store('stampede-' + owner + '-' + repo + '-config', config)
@@ -76,7 +76,7 @@ async function storeRepoConfig(owner, repo, config) {
 
 /**
  * storeSystemDefaults
- * @param {*} defaults 
+ * @param {*} defaults
  */
 async function storeSystemDefaults(defaults) {
   await store('stampede-config-defaults', defaults)
@@ -93,7 +93,7 @@ async function fetchSystemDefaults() {
 
 /**
  * storeSystemOverrides
- * @param {*} overrides 
+ * @param {*} overrides
  */
 async function storeSystemOverrides(overrides) {
   await store('stampede-config-overrides', overrides)
@@ -101,7 +101,7 @@ async function storeSystemOverrides(overrides) {
 
 /**
  * fetchSystemOverrides
- * @return {*} overrides 
+ * @return {*} overrides
  */
 async function fetchSystemOverrides() {
   const overrides = await fetch('stampede-config-overrides')
@@ -112,7 +112,7 @@ async function fetchSystemOverrides() {
 
 /**
  * incrementBuildNumber
- * @param {*} buildPath 
+ * @param {*} buildPath
  */
 async function incrementBuildNumber(buildPath) {
   const buildNumber = await increment('stampede-' + buildPath)
@@ -129,7 +129,7 @@ async function fetchActiveBuilds() {
 
 /**
  * addBuildToActiveList
- * @param {*} build 
+ * @param {*} build
  */
 async function addBuildToActiveList(build) {
   await add('stampede-activebuilds', build)
@@ -145,7 +145,7 @@ async function removeBuildFromActiveList(build) {
 
 /**
  * Fetch active tasks
- * @param {*} build 
+ * @param {*} build
  */
 async function fetchActiveTasks(build) {
   const tasks = await fetchMembers('stampede-' + build)
@@ -155,7 +155,7 @@ async function fetchActiveTasks(build) {
 /**
  * addTaskToActiveList
  * @param {*} build
- * @param {*} task 
+ * @param {*} task
  */
 async function addTaskToActiveList(build, task) {
   await add('stampede-' + build, task)
@@ -170,9 +170,45 @@ async function removeTaskFromActiveList(build, task) {
   await removeMember('stampede-' + build, task)
 }
 
+/**
+ * addTaskToPendingList
+ * @param {*} parentTaskID
+ * @param {*} task
+ */
+async function addTaskToPendingList(parentTaskID, task) {
+  await add('stampede-' + parentTaskID, JSON.stringify(task))
+}
+
+/**
+ * pendingTasks
+ * @param {*} parentTaskID
+ */
+async function pendingTasks(parentTaskID) {
+  const tasks = await fetchMembers('stampede-' + parentTaskID)
+  const pending = []
+  if (tasks != null) {
+    for (let index = 0; index < tasks.length; index++) {
+      pending.push(JSON.parse(tasks[index]))
+    }
+  }
+  return pending
+}
+
+/**
+ * removePendingList
+ * @param {*} parentTaskID
+ */
+async function removePendingList(parentTaskID) {
+  await remove('stampede-' + parentTaskID)
+}
 
 // Private functions
 
+/**
+ * createRedisClient
+ * @param {*} conf
+ * @return {object} redis client
+ */
 function createRedisClient(conf) {
   if (conf.redisPassword != null) {
     return asyncRedis.createClient({host: conf.redisHost,
@@ -184,6 +220,11 @@ function createRedisClient(conf) {
   }
 }
 
+/**
+ * add
+ * @param {*} key
+ * @param {*} value
+ */
 async function add(key, value) {
   try {
     await client.sadd(key, value)
@@ -192,6 +233,11 @@ async function add(key, value) {
   }
 }
 
+/**
+ * store
+ * @param {*} key
+ * @param {*} value
+ */
 async function store(key, value) {
   try {
     await client.set(key, JSON.stringify(value))
@@ -200,6 +246,10 @@ async function store(key, value) {
   }
 }
 
+/**
+ * increment
+ * @param {*} key
+ */
 async function increment(key) {
   console.log('-- Incrementing: ' + key)
   try {
@@ -211,6 +261,10 @@ async function increment(key) {
   }
 }
 
+/**
+ * remove
+ * @param {*} key
+ */
 async function remove(key) {
   try {
     await client.del(key)
@@ -219,6 +273,11 @@ async function remove(key) {
   }
 }
 
+/**
+ * removeMember
+ * @param {*} key
+ * @param {*} value
+ */
 async function removeMember(key, value) {
   try {
     await client.srem(key, value)
@@ -227,6 +286,11 @@ async function removeMember(key, value) {
   }
 }
 
+/**
+ * fetch
+ * @param {*} key
+ * @param {*} defaultValue
+ */
 async function fetch(key, defaultValue) {
   console.log('-- Fetching: ' + key)
   try {
@@ -242,6 +306,11 @@ async function fetch(key, defaultValue) {
   }
 }
 
+/**
+ * fetchMembers
+ * @param {*} key
+ * @param {*} defaultValue
+ */
 async function fetchMembers(key, defaultValue) {
   console.log('-- Fetching: ' + key)
   try {
@@ -283,3 +352,6 @@ module.exports.removeBuildFromActiveList = removeBuildFromActiveList
 module.exports.fetchActiveTasks = fetchActiveTasks
 module.exports.addTaskToActiveList = addTaskToActiveList
 module.exports.removeTaskFromActiveList = removeTaskFromActiveList
+module.exports.addTaskToPendingList = addTaskToPendingList
+module.exports.pendingTasks = pendingTasks
+module.exports.removePendingList = removePendingList
