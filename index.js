@@ -39,14 +39,31 @@ async function fetchTaskConfig(id) {
 }
 
 /**
- * storeTaskConfig
- * @param {*} tasks
+ * removeTaskConfig
  */
-async function storeTaskConfig(tasks) {
+async function removeTaskConfig() {
+  const tasks = await fetchMembers('stampede-tasks')
   for (let index = 0; index < tasks.length; index++) {
-    await add('stampede-tasks', tasks[index].id)
-    await store('stampede-tasks-' + tasks[index].id, tasks[index])
+    remove('stampede-' + tasks[index])
   }
+  await remove('stampede-tasks')
+}
+
+/**
+ * storeTask
+ * @param {*} id
+ */
+async function storeTask(id) {
+  await add('stampede-tasks', id)
+}
+
+/**
+ * storeTaskConfig
+ * @param {*} id
+ * @param {*} config
+ */
+async function storeTaskConfig(id, config) {
+  await store('stampede-tasks-' + id, config)
 }
 
 // Repo Config
@@ -332,6 +349,8 @@ module.exports.startCache = startCache
 // Tasks
 module.exports.fetchTasks = fetchTasks
 module.exports.fetchTaskConfig = fetchTaskConfig
+module.exports.removeTaskConfig = removeTaskConfig
+module.exports.storeTask = storeTask
 module.exports.storeTaskConfig = storeTaskConfig
 
 // Repo config
