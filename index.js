@@ -219,6 +219,35 @@ async function removePendingList(parentTaskID) {
   await remove('stampede-' + parentTaskID)
 }
 
+// Heartbeat
+
+/**
+ * storeWorkerHeartbeat
+ * @param {*} heartbeat
+ */
+async function storeWorkerHeartbeat(heartbeat) {
+  await add('stampede-activeworkers', heartbeat.workerID)
+  await store('stampede-worker-' + heartbeat.workerID, heartbeat, 35)
+}
+
+/**
+ * fetchActiveWorkers
+ */
+async function fetchActiveWorkers() {
+  const activeWorkers = []
+  const workers = await fetchMembers('stampede-activeworkers')
+  for (let index = 0; index < workers.length; index++) {
+    const worker = await fetch('stampede-worker-' + workers[index])
+    if (worker != null) {
+      activeWorkers.push(worker)
+    } else {
+      await removeMember('stampede-activeworkers', workers[index])
+    }
+  }
+  return workers
+}
+
+
 // Private functions
 
 /**
@@ -254,10 +283,15 @@ async function add(key, value) {
  * store
  * @param {*} key
  * @param {*} value
+ * @param {int} expiring
  */
-async function store(key, value) {
+async function store(key, value, expiring) {
   try {
-    await client.set(key, JSON.stringify(value))
+    if (expiring != null) {
+      await client.set(key, JSON.stringify(value), 'EX', expiring)
+    } else {
+      await client.set(key, JSON.stringify(value))
+    }
   } catch (e) {
     console.log('Error setting key ' + key + ': ' + e)
   }
@@ -374,3 +408,7 @@ module.exports.removeTaskFromActiveList = removeTaskFromActiveList
 module.exports.addTaskToPendingList = addTaskToPendingList
 module.exports.pendingTasks = pendingTasks
 module.exports.removePendingList = removePendingList
+
+// Heartbeat
+module.exports.storeWorkerHeartbeat = storeWorkerHeartbeat
+module.exports.fetchActiveWorkers = fetchActiveWorkers
