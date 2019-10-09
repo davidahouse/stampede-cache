@@ -244,7 +244,7 @@ async function fetchActiveWorkers() {
       await removeMember('stampede-activeworkers', workers[index])
     }
   }
-  return workers
+  return activeWorkers
 }
 
 
