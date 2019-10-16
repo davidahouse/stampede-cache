@@ -89,6 +89,17 @@ async function storeRepoConfig(owner, repo, config) {
   await store('stampede-' + owner + '-' + repo + '-config', config)
 }
 
+/**
+ * removeRepoConfig
+ * @param {*} owner
+ * @param {*} repo
+ * @param {*} config
+ */
+async function removeRepoConfig(owner, repo, config) {
+  await remove('stampede-' + owner + '-' + repo + '-config')
+}
+
+
 // System level config
 
 /**
@@ -390,6 +401,7 @@ module.exports.storeTaskConfig = storeTaskConfig
 // Repo config
 module.exports.fetchRepoConfig = fetchRepoConfig
 module.exports.storeRepoConfig = storeRepoConfig
+module.exports.removeRepoConfig = removeRepoConfig
 
 // System config
 module.exports.storeSystemDefaults = storeSystemDefaults
