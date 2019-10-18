@@ -93,9 +93,8 @@ async function storeRepoConfig(owner, repo, config) {
  * removeRepoConfig
  * @param {*} owner
  * @param {*} repo
- * @param {*} config
  */
-async function removeRepoConfig(owner, repo, config) {
+async function removeRepoConfig(owner, repo) {
   await remove('stampede-' + owner + '-' + repo + '-config')
 }
 
