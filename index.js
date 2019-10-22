@@ -89,7 +89,33 @@ async function storeRepoConfig(owner, repo, config) {
   await store("stampede-" + owner + "-" + repo + "-config", config);
 }
 
+/**
+ * removeRepoConfig
+ * @param {*} owner
+ * @param {*} repo
+ */
+async function removeRepoConfig(owner, repo) {
+  await remove("stampede-" + owner + "-" + repo + "-config");
+}
+
 // System level config
+
+/**
+ * storeSystemQueues
+ * @param {*} queues
+ */
+async function storeSystemQueues(queues) {
+  await store("stampede-config-queues", queues);
+}
+
+/**
+ * fetchSystemQueues
+ * @return {*} queues
+ */
+async function fetchSystemQueues() {
+  const queues = await fetch("stampede-config-queues");
+  return queues;
+}
 
 /**
  * storeSystemDefaults
@@ -402,10 +428,13 @@ module.exports.storeTaskConfig = storeTaskConfig;
 // Repo config
 module.exports.fetchRepoConfig = fetchRepoConfig;
 module.exports.storeRepoConfig = storeRepoConfig;
+module.exports.removeRepoConfig = removeRepoConfig;
 
 // System config
+module.exports.storeSystemQueues = storeSystemQueues;
 module.exports.storeSystemDefaults = storeSystemDefaults;
 module.exports.storeSystemOverrides = storeSystemOverrides;
+module.exports.fetchSystemQueues = fetchSystemQueues;
 module.exports.fetchSystemDefaults = fetchSystemDefaults;
 module.exports.fetchSystemOverrides = fetchSystemOverrides;
 
