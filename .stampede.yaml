@@ -6,11 +6,6 @@ pullrequests:
     - id: pr-standards
       config:
         prMilestoneCheck: true
-branches:
-  master:
-    config:
-    tasks:
-      - id: unit-tests-nodejs
 releases:
   published:
     tasks:
