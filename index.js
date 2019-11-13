@@ -18,6 +18,13 @@ function startCache(conf) {
   });
 }
 
+/**
+ * stopCache
+ */
+async function stopCache() {
+  await client.quit();
+}
+
 // Tasks
 
 /**
@@ -417,6 +424,7 @@ async function fetchMembers(key, defaultValue) {
 
 // General
 module.exports.startCache = startCache;
+module.exports.stopCache = stopCache;
 
 // Tasks
 module.exports.fetchTasks = fetchTasks;
