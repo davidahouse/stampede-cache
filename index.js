@@ -47,8 +47,17 @@ async function fetchTaskConfig(id) {
 
 /**
  * removeTaskConfig
+ * @param {*} id
  */
-async function removeTaskConfig() {
+async function removeTaskConfig(id) {
+  await remove("stampede-" + id)
+  await removeMember(id, "stampede-tasks")
+}
+
+/**
+ * removeAllTasks
+ */
+async function removeAllTasks() {
   const tasks = await fetchMembers("stampede-tasks");
   for (let index = 0; index < tasks.length; index++) {
     remove("stampede-" + tasks[index]);
@@ -432,6 +441,7 @@ module.exports.fetchTaskConfig = fetchTaskConfig;
 module.exports.removeTaskConfig = removeTaskConfig;
 module.exports.storeTask = storeTask;
 module.exports.storeTaskConfig = storeTaskConfig;
+module.exports.removeAllTasks = removeAllTasks;
 
 // Repo config
 module.exports.fetchRepoConfig = fetchRepoConfig;
