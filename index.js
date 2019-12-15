@@ -51,7 +51,7 @@ async function fetchTaskConfig(id) {
  */
 async function removeTaskConfig(id) {
   await remove("stampede-" + id)
-  await removeMember(id, "stampede-tasks")
+  await removeMember("stampede-tasks", id)
 }
 
 /**
