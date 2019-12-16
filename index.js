@@ -151,6 +151,28 @@ async function fetchSystemDefaults() {
 }
 
 /**
+ * setSystemDefault
+ * @param {*} name
+ * @param {*} value 
+ */
+async function setSystemDefault(name, value) {
+  const defaults = await fetchSystemDefaults()
+  defaults.defaults[name] = value
+  await storeSystemDefaults(defaults)
+}
+
+/**
+ * removeSystemDefault
+ * @param {*} name
+ * @param {*} value 
+ */
+async function removeSystemDefault(name) {
+  const defaults = await fetchSystemDefaults()
+  defaults.defaults[name] = null
+  await storeSystemDefaults(defaults)
+}
+
+/**
  * storeSystemOverrides
  * @param {*} overrides
  */
@@ -451,6 +473,8 @@ module.exports.removeRepoConfig = removeRepoConfig;
 // System config
 module.exports.storeSystemQueues = storeSystemQueues;
 module.exports.storeSystemDefaults = storeSystemDefaults;
+module.exports.setSystemDefault = setSystemDefault;
+module.exports.removeSystemDefault= removeSystemDefault;
 module.exports.storeSystemOverrides = storeSystemOverrides;
 module.exports.fetchSystemQueues = fetchSystemQueues;
 module.exports.fetchSystemDefaults = fetchSystemDefaults;
