@@ -196,7 +196,7 @@ async function fetchSystemOverrides() {
 async function setSystemOverride(name, value) {
   const overrides = await fetchSystemOverrides()
   overrides.overrides[name] = value
-  await storeSystemOverrides(defaults)
+  await storeSystemOverrides(overrides)
 }
 
 /**
@@ -206,7 +206,7 @@ async function setSystemOverride(name, value) {
 async function removeSystemOverride(name) {
   const overrides = await fetchSystemOverrides()
   overrides.overrides[name] = null
-  await storeSystemOverrides(defaults)
+  await storeSystemOverrides(overrides)
 }
 
 
