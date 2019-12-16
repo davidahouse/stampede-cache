@@ -164,7 +164,6 @@ async function setSystemDefault(name, value) {
 /**
  * removeSystemDefault
  * @param {*} name
- * @param {*} value 
  */
 async function removeSystemDefault(name) {
   const defaults = await fetchSystemDefaults()
@@ -188,6 +187,28 @@ async function fetchSystemOverrides() {
   const overrides = await fetch("stampede-config-overrides");
   return overrides;
 }
+
+/**
+ * setSystemOverride
+ * @param {*} name
+ * @param {*} value 
+ */
+async function setSystemOverride(name, value) {
+  const overrides = await fetchSystemOverrides()
+  overrides.overrides[name] = value
+  await storeSystemOverrides(defaults)
+}
+
+/**
+ * removeSystemOverride
+ * @param {*} name
+ */
+async function removeSystemOverride(name) {
+  const overrides = await fetchSystemOverrides()
+  overrides.overrides[name] = null
+  await storeSystemOverrides(defaults)
+}
+
 
 // Builds
 
@@ -474,11 +495,13 @@ module.exports.removeRepoConfig = removeRepoConfig;
 module.exports.storeSystemQueues = storeSystemQueues;
 module.exports.storeSystemDefaults = storeSystemDefaults;
 module.exports.setSystemDefault = setSystemDefault;
-module.exports.removeSystemDefault= removeSystemDefault;
+module.exports.removeSystemDefault = removeSystemDefault;
 module.exports.storeSystemOverrides = storeSystemOverrides;
 module.exports.fetchSystemQueues = fetchSystemQueues;
 module.exports.fetchSystemDefaults = fetchSystemDefaults;
 module.exports.fetchSystemOverrides = fetchSystemOverrides;
+module.exports.setSystemOverride = setSystemOverride;
+module.exports.removeSystemOverride = removeSystemOverride;
 
 // Builds
 module.exports.fetchBuildNumber = fetchBuildNumber;
