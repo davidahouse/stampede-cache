@@ -1,7 +1,9 @@
 "use strict";
-const asyncRedis = require("async-redis");
 
-let client;
+const client = require("lib/cacheClient");
+
+// Submodules
+const orgConfigDefaults = require("lib/orgConfigDefaults");
 
 // Public functions
 
@@ -12,10 +14,8 @@ let client;
  * @param {*} conf
  */
 function startCache(conf) {
-  client = createRedisClient(conf);
-  client.on("error", function(err) {
-    console.log("redis connect error: " + err);
-  });
+  client.createRedisClient(conf);
+  orgConfigDefaults.setClient(client);
 }
 
 /**
@@ -50,8 +50,8 @@ async function fetchTaskConfig(id) {
  * @param {*} id
  */
 async function removeTaskConfig(id) {
-  await remove("stampede-" + id)
-  await removeMember("stampede-tasks", id)
+  await remove("stampede-" + id);
+  await removeMember("stampede-tasks", id);
 }
 
 /**
@@ -153,12 +153,12 @@ async function fetchSystemDefaults() {
 /**
  * setSystemDefault
  * @param {*} name
- * @param {*} value 
+ * @param {*} value
  */
 async function setSystemDefault(name, value) {
-  const defaults = await fetchSystemDefaults()
-  defaults.defaults[name] = value
-  await storeSystemDefaults(defaults)
+  const defaults = await fetchSystemDefaults();
+  defaults.defaults[name] = value;
+  await storeSystemDefaults(defaults);
 }
 
 /**
@@ -166,9 +166,9 @@ async function setSystemDefault(name, value) {
  * @param {*} name
  */
 async function removeSystemDefault(name) {
-  const defaults = await fetchSystemDefaults()
-  defaults.defaults[name] = null
-  await storeSystemDefaults(defaults)
+  const defaults = await fetchSystemDefaults();
+  defaults.defaults[name] = null;
+  await storeSystemDefaults(defaults);
 }
 
 /**
@@ -191,12 +191,12 @@ async function fetchSystemOverrides() {
 /**
  * setSystemOverride
  * @param {*} name
- * @param {*} value 
+ * @param {*} value
  */
 async function setSystemOverride(name, value) {
-  const overrides = await fetchSystemOverrides()
-  overrides.overrides[name] = value
-  await storeSystemOverrides(overrides)
+  const overrides = await fetchSystemOverrides();
+  overrides.overrides[name] = value;
+  await storeSystemOverrides(overrides);
 }
 
 /**
@@ -204,11 +204,10 @@ async function setSystemOverride(name, value) {
  * @param {*} name
  */
 async function removeSystemOverride(name) {
-  const overrides = await fetchSystemOverrides()
-  overrides.overrides[name] = null
-  await storeSystemOverrides(overrides)
+  const overrides = await fetchSystemOverrides();
+  overrides.overrides[name] = null;
+  await storeSystemOverrides(overrides);
 }
-
 
 // Builds
 
@@ -343,137 +342,6 @@ async function fetchActiveWorkers() {
 
 // Private functions
 
-/**
- * createRedisClient
- * @param {*} conf
- * @return {object} redis client
- */
-function createRedisClient(conf) {
-  if (conf.redisPassword != null) {
-    return asyncRedis.createClient({
-      host: conf.redisHost,
-      port: conf.redisPort,
-      password: conf.redisPassword
-    });
-  } else {
-    return asyncRedis.createClient({
-      host: conf.redisHost,
-      port: conf.redisPort
-    });
-  }
-}
-
-/**
- * add
- * @param {*} key
- * @param {*} value
- */
-async function add(key, value) {
-  try {
-    await client.sadd(key, value);
-  } catch (e) {
-    console.log("Error adding key " + key + ": " + e);
-  }
-}
-
-/**
- * store
- * @param {*} key
- * @param {*} value
- * @param {int} expiring
- */
-async function store(key, value, expiring) {
-  try {
-    if (expiring != null) {
-      await client.set(key, JSON.stringify(value), "EX", expiring);
-    } else {
-      await client.set(key, JSON.stringify(value));
-    }
-  } catch (e) {
-    console.log("Error setting key " + key + ": " + e);
-  }
-}
-
-/**
- * increment
- * @param {*} key
- */
-async function increment(key) {
-  console.log("-- Incrementing: " + key);
-  try {
-    const value = await client.incr(key);
-    return value;
-  } catch (e) {
-    console.log("Error incrementing key: " + key + " " + e);
-    return null;
-  }
-}
-
-/**
- * remove
- * @param {*} key
- */
-async function remove(key) {
-  try {
-    await client.del(key);
-  } catch (e) {
-    console.log("Error removing " + key + ": " + e);
-  }
-}
-
-/**
- * removeMember
- * @param {*} key
- * @param {*} value
- */
-async function removeMember(key, value) {
-  try {
-    await client.srem(key, value);
-  } catch (e) {
-    console.log("Error removing " + key + ": " + value + ": " + e);
-  }
-}
-
-/**
- * fetch
- * @param {*} key
- * @param {*} defaultValue
- */
-async function fetch(key, defaultValue) {
-  console.log("-- Fetching: " + key);
-  try {
-    const value = await client.get(key);
-    if (value != null) {
-      return JSON.parse(value);
-    } else {
-      return defaultValue;
-    }
-  } catch (e) {
-    console.log("Error fetching key: " + key + " " + e);
-    return defaultValue;
-  }
-}
-
-/**
- * fetchMembers
- * @param {*} key
- * @param {*} defaultValue
- */
-async function fetchMembers(key, defaultValue) {
-  console.log("-- Fetching: " + key);
-  try {
-    const value = await client.smembers(key);
-    if (value != null) {
-      return value;
-    } else {
-      return defaultValue;
-    }
-  } catch (e) {
-    console.log("Error fetching key: " + key + " " + e);
-    return defaultValue;
-  }
-}
-
 // General
 module.exports.startCache = startCache;
 module.exports.stopCache = stopCache;
@@ -519,3 +387,6 @@ module.exports.removePendingList = removePendingList;
 // Heartbeat
 module.exports.storeWorkerHeartbeat = storeWorkerHeartbeat;
 module.exports.fetchActiveWorkers = fetchActiveWorkers;
+
+// Modules
+module.exports.orgConfigDefaults = orgConfigDefaults;
