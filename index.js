@@ -1,7 +1,9 @@
 "use strict";
-const asyncRedis = require("async-redis");
 
-let client;
+const client = require("lib/cacheClient");
+
+// Submodules
+const orgConfigDefaults = require("lib/orgConfigDefaults");
 
 // Public functions
 
@@ -12,10 +14,8 @@ let client;
  * @param {*} conf
  */
 function startCache(conf) {
-  client = createRedisClient(conf);
-  client.on("error", function(err) {
-    console.log("redis connect error: " + err);
-  });
+  client.createRedisClient(conf);
+  orgConfigDefaults.setClient(client);
 }
 
 /**
@@ -31,7 +31,7 @@ async function stopCache() {
  * fetchTasks
  */
 async function fetchTasks() {
-  const tasks = await fetchMembers("stampede-tasks");
+  const tasks = await client.fetchMembers("stampede-tasks");
   return tasks;
 }
 
@@ -41,7 +41,7 @@ async function fetchTasks() {
  * @return {Object} task config
  */
 async function fetchTaskConfig(id) {
-  const config = await fetch("stampede-tasks-" + id);
+  const config = await client.fetch("stampede-tasks-" + id);
   return config;
 }
 
@@ -50,19 +50,19 @@ async function fetchTaskConfig(id) {
  * @param {*} id
  */
 async function removeTaskConfig(id) {
-  await remove("stampede-" + id)
-  await removeMember("stampede-tasks", id)
+  await client.remove("stampede-" + id);
+  await client.removeMember("stampede-tasks", id);
 }
 
 /**
  * removeAllTasks
  */
 async function removeAllTasks() {
-  const tasks = await fetchMembers("stampede-tasks");
+  const tasks = await client.fetchMembers("stampede-tasks");
   for (let index = 0; index < tasks.length; index++) {
-    remove("stampede-" + tasks[index]);
+    await client.remove("stampede-" + tasks[index]);
   }
-  await remove("stampede-tasks");
+  await client.remove("stampede-tasks");
 }
 
 /**
@@ -70,7 +70,7 @@ async function removeAllTasks() {
  * @param {*} id
  */
 async function storeTask(id) {
-  await add("stampede-tasks", id);
+  await client.add("stampede-tasks", id);
 }
 
 /**
@@ -79,7 +79,7 @@ async function storeTask(id) {
  * @param {*} config
  */
 async function storeTaskConfig(id, config) {
-  await store("stampede-tasks-" + id, config);
+  await client.store("stampede-tasks-" + id, config);
 }
 
 // Repo Config
@@ -91,7 +91,9 @@ async function storeTaskConfig(id, config) {
  * @return {Object} config
  */
 async function fetchRepoConfig(owner, repo) {
-  const config = await fetch("stampede-" + owner + "-" + repo + "-config");
+  const config = await client.fetch(
+    "stampede-" + owner + "-" + repo + "-config"
+  );
   return config;
 }
 
@@ -102,7 +104,7 @@ async function fetchRepoConfig(owner, repo) {
  * @param {*} config
  */
 async function storeRepoConfig(owner, repo, config) {
-  await store("stampede-" + owner + "-" + repo + "-config", config);
+  await client.store("stampede-" + owner + "-" + repo + "-config", config);
 }
 
 /**
@@ -111,7 +113,7 @@ async function storeRepoConfig(owner, repo, config) {
  * @param {*} repo
  */
 async function removeRepoConfig(owner, repo) {
-  await remove("stampede-" + owner + "-" + repo + "-config");
+  await client.remove("stampede-" + owner + "-" + repo + "-config");
 }
 
 // System level config
@@ -121,7 +123,7 @@ async function removeRepoConfig(owner, repo) {
  * @param {*} queues
  */
 async function storeSystemQueues(queues) {
-  await store("stampede-config-queues", queues);
+  await client.store("stampede-config-queues", queues);
 }
 
 /**
@@ -129,7 +131,7 @@ async function storeSystemQueues(queues) {
  * @return {*} queues
  */
 async function fetchSystemQueues() {
-  const queues = await fetch("stampede-config-queues");
+  const queues = await client.fetch("stampede-config-queues");
   return queues;
 }
 
@@ -138,7 +140,7 @@ async function fetchSystemQueues() {
  * @param {*} defaults
  */
 async function storeSystemDefaults(defaults) {
-  await store("stampede-config-defaults", defaults);
+  await client.store("stampede-config-defaults", defaults);
 }
 
 /**
@@ -146,19 +148,19 @@ async function storeSystemDefaults(defaults) {
  * @return {*} defaults
  */
 async function fetchSystemDefaults() {
-  const defaults = await fetch("stampede-config-defaults");
+  const defaults = await client.fetch("stampede-config-defaults");
   return defaults;
 }
 
 /**
  * setSystemDefault
  * @param {*} name
- * @param {*} value 
+ * @param {*} value
  */
 async function setSystemDefault(name, value) {
-  const defaults = await fetchSystemDefaults()
-  defaults.defaults[name] = value
-  await storeSystemDefaults(defaults)
+  const defaults = await fetchSystemDefaults();
+  defaults.defaults[name] = value;
+  await storeSystemDefaults(defaults);
 }
 
 /**
@@ -166,9 +168,9 @@ async function setSystemDefault(name, value) {
  * @param {*} name
  */
 async function removeSystemDefault(name) {
-  const defaults = await fetchSystemDefaults()
-  defaults.defaults[name] = null
-  await storeSystemDefaults(defaults)
+  const defaults = await fetchSystemDefaults();
+  defaults.defaults[name] = null;
+  await storeSystemDefaults(defaults);
 }
 
 /**
@@ -176,7 +178,7 @@ async function removeSystemDefault(name) {
  * @param {*} overrides
  */
 async function storeSystemOverrides(overrides) {
-  await store("stampede-config-overrides", overrides);
+  await client.store("stampede-config-overrides", overrides);
 }
 
 /**
@@ -184,19 +186,19 @@ async function storeSystemOverrides(overrides) {
  * @return {*} overrides
  */
 async function fetchSystemOverrides() {
-  const overrides = await fetch("stampede-config-overrides");
+  const overrides = await client.fetch("stampede-config-overrides");
   return overrides;
 }
 
 /**
  * setSystemOverride
  * @param {*} name
- * @param {*} value 
+ * @param {*} value
  */
 async function setSystemOverride(name, value) {
-  const overrides = await fetchSystemOverrides()
-  overrides.overrides[name] = value
-  await storeSystemOverrides(overrides)
+  const overrides = await fetchSystemOverrides();
+  overrides.overrides[name] = value;
+  await storeSystemOverrides(overrides);
 }
 
 /**
@@ -204,11 +206,10 @@ async function setSystemOverride(name, value) {
  * @param {*} name
  */
 async function removeSystemOverride(name) {
-  const overrides = await fetchSystemOverrides()
-  overrides.overrides[name] = null
-  await storeSystemOverrides(overrides)
+  const overrides = await fetchSystemOverrides();
+  overrides.overrides[name] = null;
+  await storeSystemOverrides(overrides);
 }
-
 
 // Builds
 
@@ -217,7 +218,7 @@ async function removeSystemOverride(name) {
  * @param {*} buildPath
  */
 async function incrementBuildNumber(buildPath) {
-  const buildNumber = await increment("stampede-" + buildPath);
+  const buildNumber = await client.increment("stampede-" + buildPath);
   return buildNumber;
 }
 
@@ -226,7 +227,7 @@ async function incrementBuildNumber(buildPath) {
  * @param {*} buildPath
  */
 async function fetchBuildNumber(buildPath) {
-  const buildNumber = await fetch("stampede-" + buildPath);
+  const buildNumber = await client.fetch("stampede-" + buildPath);
   return buildNumber;
 }
 
@@ -234,7 +235,7 @@ async function fetchBuildNumber(buildPath) {
  * fetchActiveBuilds
  */
 async function fetchActiveBuilds() {
-  const builds = await fetchMembers("stampede-activebuilds");
+  const builds = await client.fetchMembers("stampede-activebuilds");
   return builds;
 }
 
@@ -243,7 +244,7 @@ async function fetchActiveBuilds() {
  * @param {*} build
  */
 async function addBuildToActiveList(build) {
-  await add("stampede-activebuilds", build);
+  await client.add("stampede-activebuilds", build);
 }
 
 /**
@@ -251,7 +252,7 @@ async function addBuildToActiveList(build) {
  * @param {*} build
  */
 async function removeBuildFromActiveList(build) {
-  await removeMember("stampede-activebuilds", build);
+  await client.removeMember("stampede-activebuilds", build);
 }
 
 /**
@@ -259,7 +260,7 @@ async function removeBuildFromActiveList(build) {
  * @param {*} build
  */
 async function fetchActiveTasks(build) {
-  const tasks = await fetchMembers("stampede-" + build);
+  const tasks = await client.fetchMembers("stampede-" + build);
   return tasks;
 }
 
@@ -269,7 +270,7 @@ async function fetchActiveTasks(build) {
  * @param {*} task
  */
 async function addTaskToActiveList(build, task) {
-  await add("stampede-" + build, task);
+  await client.add("stampede-" + build, task);
 }
 
 /**
@@ -278,7 +279,7 @@ async function addTaskToActiveList(build, task) {
  * @param {*} task
  */
 async function removeTaskFromActiveList(build, task) {
-  await removeMember("stampede-" + build, task);
+  await client.removeMember("stampede-" + build, task);
 }
 
 /**
@@ -287,7 +288,7 @@ async function removeTaskFromActiveList(build, task) {
  * @param {*} task
  */
 async function addTaskToPendingList(parentTaskID, task) {
-  await add("stampede-" + parentTaskID, JSON.stringify(task));
+  await client.add("stampede-" + parentTaskID, JSON.stringify(task));
 }
 
 /**
@@ -295,7 +296,7 @@ async function addTaskToPendingList(parentTaskID, task) {
  * @param {*} parentTaskID
  */
 async function pendingTasks(parentTaskID) {
-  const tasks = await fetchMembers("stampede-" + parentTaskID);
+  const tasks = await client.fetchMembers("stampede-" + parentTaskID);
   const pending = [];
   if (tasks != null) {
     for (let index = 0; index < tasks.length; index++) {
@@ -310,7 +311,7 @@ async function pendingTasks(parentTaskID) {
  * @param {*} parentTaskID
  */
 async function removePendingList(parentTaskID) {
-  await remove("stampede-" + parentTaskID);
+  await client.remove("stampede-" + parentTaskID);
 }
 
 // Heartbeat
@@ -320,8 +321,8 @@ async function removePendingList(parentTaskID) {
  * @param {*} heartbeat
  */
 async function storeWorkerHeartbeat(heartbeat) {
-  await add("stampede-activeworkers", heartbeat.workerID);
-  await store("stampede-worker-" + heartbeat.workerID, heartbeat, 35);
+  await client.add("stampede-activeworkers", heartbeat.workerID);
+  await client.store("stampede-worker-" + heartbeat.workerID, heartbeat, 35);
 }
 
 /**
@@ -329,150 +330,19 @@ async function storeWorkerHeartbeat(heartbeat) {
  */
 async function fetchActiveWorkers() {
   const activeWorkers = [];
-  const workers = await fetchMembers("stampede-activeworkers");
+  const workers = await client.fetchMembers("stampede-activeworkers");
   for (let index = 0; index < workers.length; index++) {
-    const worker = await fetch("stampede-worker-" + workers[index]);
+    const worker = await client.fetch("stampede-worker-" + workers[index]);
     if (worker != null) {
       activeWorkers.push(worker);
     } else {
-      await removeMember("stampede-activeworkers", workers[index]);
+      await client.removeMember("stampede-activeworkers", workers[index]);
     }
   }
   return activeWorkers;
 }
 
 // Private functions
-
-/**
- * createRedisClient
- * @param {*} conf
- * @return {object} redis client
- */
-function createRedisClient(conf) {
-  if (conf.redisPassword != null) {
-    return asyncRedis.createClient({
-      host: conf.redisHost,
-      port: conf.redisPort,
-      password: conf.redisPassword
-    });
-  } else {
-    return asyncRedis.createClient({
-      host: conf.redisHost,
-      port: conf.redisPort
-    });
-  }
-}
-
-/**
- * add
- * @param {*} key
- * @param {*} value
- */
-async function add(key, value) {
-  try {
-    await client.sadd(key, value);
-  } catch (e) {
-    console.log("Error adding key " + key + ": " + e);
-  }
-}
-
-/**
- * store
- * @param {*} key
- * @param {*} value
- * @param {int} expiring
- */
-async function store(key, value, expiring) {
-  try {
-    if (expiring != null) {
-      await client.set(key, JSON.stringify(value), "EX", expiring);
-    } else {
-      await client.set(key, JSON.stringify(value));
-    }
-  } catch (e) {
-    console.log("Error setting key " + key + ": " + e);
-  }
-}
-
-/**
- * increment
- * @param {*} key
- */
-async function increment(key) {
-  console.log("-- Incrementing: " + key);
-  try {
-    const value = await client.incr(key);
-    return value;
-  } catch (e) {
-    console.log("Error incrementing key: " + key + " " + e);
-    return null;
-  }
-}
-
-/**
- * remove
- * @param {*} key
- */
-async function remove(key) {
-  try {
-    await client.del(key);
-  } catch (e) {
-    console.log("Error removing " + key + ": " + e);
-  }
-}
-
-/**
- * removeMember
- * @param {*} key
- * @param {*} value
- */
-async function removeMember(key, value) {
-  try {
-    await client.srem(key, value);
-  } catch (e) {
-    console.log("Error removing " + key + ": " + value + ": " + e);
-  }
-}
-
-/**
- * fetch
- * @param {*} key
- * @param {*} defaultValue
- */
-async function fetch(key, defaultValue) {
-  console.log("-- Fetching: " + key);
-  try {
-    const value = await client.get(key);
-    if (value != null) {
-      return JSON.parse(value);
-    } else {
-      return defaultValue;
-    }
-  } catch (e) {
-    console.log("Error fetching key: " + key + " " + e);
-    return defaultValue;
-  }
-}
-
-/**
- * fetchMembers
- * @param {*} key
- * @param {*} defaultValue
- */
-async function fetchMembers(key, defaultValue) {
-  console.log("-- Fetching: " + key);
-  try {
-    const value = await client.smembers(key);
-    if (value != null) {
-      return value;
-    } else {
-      return defaultValue;
-    }
-  } catch (e) {
-    console.log("Error fetching key: " + key + " " + e);
-    return defaultValue;
-  }
-}
 
 // General
 module.exports.startCache = startCache;
@@ -519,3 +389,6 @@ module.exports.removePendingList = removePendingList;
 // Heartbeat
 module.exports.storeWorkerHeartbeat = storeWorkerHeartbeat;
 module.exports.fetchActiveWorkers = fetchActiveWorkers;
+
+// Modules
+module.exports.orgConfigDefaults = orgConfigDefaults;
