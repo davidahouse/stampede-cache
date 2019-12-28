@@ -22,6 +22,7 @@ function startCache(conf) {
   orgConfigDefaults.setClient(client);
   orgConfigOverrides.setClient(client);
   repoConfigDefaults.setClient(client);
+  repoConfigOverrides.setClient(client);
   systemQueues.setClient(client);
 }
 
