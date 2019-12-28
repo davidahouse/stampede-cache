@@ -6,6 +6,7 @@ const client = require("./lib/cacheClient");
 const orgConfigDefaults = require("./lib/orgConfigDefaults");
 const orgConfigOverrides = require("./lib/orgConfigOverrides");
 const repoConfigDefaults = require("./lib/repoConfigDefaults");
+const systemQueues = require("./lib/systemQueues");
 
 // Public functions
 
@@ -20,6 +21,7 @@ function startCache(conf) {
   orgConfigDefaults.setClient(client);
   orgConfigOverrides.setClient(client);
   repoConfigDefaults.setClient(client);
+  systemQueues.setClient(client);
 }
 
 /**
@@ -379,3 +381,4 @@ module.exports.fetchActiveWorkers = fetchActiveWorkers;
 module.exports.orgConfigDefaults = orgConfigDefaults;
 module.exports.orgConfigOverrides = orgConfigOverrides;
 module.exports.repoConfigDefaults = repoConfigDefaults;
+module.exports.systemQueues = systemQueues;
