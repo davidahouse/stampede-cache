@@ -6,6 +6,7 @@ const client = require("./lib/cacheClient");
 const orgConfigDefaults = require("./lib/orgConfigDefaults");
 const orgConfigOverrides = require("./lib/orgConfigOverrides");
 const repoConfigDefaults = require("./lib/repoConfigDefaults");
+const repoConfigOverrides = require("./lib/repoConfigOverrides");
 const systemQueues = require("./lib/systemQueues");
 
 // Public functions
@@ -381,4 +382,5 @@ module.exports.fetchActiveWorkers = fetchActiveWorkers;
 module.exports.orgConfigDefaults = orgConfigDefaults;
 module.exports.orgConfigOverrides = orgConfigOverrides;
 module.exports.repoConfigDefaults = repoConfigDefaults;
+module.exports.repoConfigOverrides = repoConfigOverrides;
 module.exports.systemQueues = systemQueues;
