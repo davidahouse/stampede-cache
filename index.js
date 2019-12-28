@@ -123,23 +123,6 @@ async function removeRepoConfig(owner, repo) {
 // System level config
 
 /**
- * storeSystemQueues
- * @param {*} queues
- */
-async function storeSystemQueues(queues) {
-  await client.store("stampede-config-queues", queues);
-}
-
-/**
- * fetchSystemQueues
- * @return {*} queues
- */
-async function fetchSystemQueues() {
-  const queues = await client.fetch("stampede-config-queues");
-  return queues;
-}
-
-/**
  * storeSystemDefaults
  * @param {*} defaults
  */
@@ -366,12 +349,10 @@ module.exports.storeRepoConfig = storeRepoConfig;
 module.exports.removeRepoConfig = removeRepoConfig;
 
 // System config
-module.exports.storeSystemQueues = storeSystemQueues;
 module.exports.storeSystemDefaults = storeSystemDefaults;
 module.exports.setSystemDefault = setSystemDefault;
 module.exports.removeSystemDefault = removeSystemDefault;
 module.exports.storeSystemOverrides = storeSystemOverrides;
-module.exports.fetchSystemQueues = fetchSystemQueues;
 module.exports.fetchSystemDefaults = fetchSystemDefaults;
 module.exports.fetchSystemOverrides = fetchSystemOverrides;
 module.exports.setSystemOverride = setSystemOverride;
