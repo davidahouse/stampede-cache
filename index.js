@@ -5,6 +5,7 @@ const client = require("lib/cacheClient");
 // Submodules
 const orgConfigDefaults = require("lib/orgConfigDefaults");
 const orgConfigOverrides = require("lib/orgConfigOverrides");
+const repoConfigDefaults = require("lib/repoConfigDefaults");
 
 // Public functions
 
@@ -18,6 +19,7 @@ function startCache(conf) {
   client.createRedisClient(conf);
   orgConfigDefaults.setClient(client);
   orgConfigOverrides.setClient(client);
+  repoConfigDefaults.setClient(client);
 }
 
 /**
@@ -395,3 +397,4 @@ module.exports.fetchActiveWorkers = fetchActiveWorkers;
 // Modules
 module.exports.orgConfigDefaults = orgConfigDefaults;
 module.exports.orgConfigOverrides = orgConfigOverrides;
+module.exports.repoConfigDefaults = repoConfigDefaults;
