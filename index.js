@@ -387,3 +387,4 @@ module.exports.orgConfigOverrides = orgConfigOverrides;
 module.exports.repoConfigDefaults = repoConfigDefaults;
 module.exports.repoConfigOverrides = repoConfigOverrides;
 module.exports.systemQueues = systemQueues;
+module.exports.repositoryBuilds = repositoryBuilds;
