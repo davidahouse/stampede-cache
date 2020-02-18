@@ -16,7 +16,11 @@ function createRedisClient(conf) {}
  * @param {*} value
  */
 async function add(key, value) {
-  cache[key] = value;
+  if (cache[key] == null) {
+    cache[key] = [value];
+  } else {
+    cache[key].push(value);
+  }
 }
 
 /**
@@ -49,7 +53,9 @@ async function remove(key) {
  * @param {*} value
  */
 async function removeMember(key, value) {
-  cache[key].delete(value);
+  if (cache[key] != null) {
+    cache[key].splice(cache[key].indexOf(value));
+  }
 }
 
 /**
