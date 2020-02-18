@@ -8,6 +8,7 @@ const orgConfigOverrides = require("./lib/orgConfigOverrides");
 const repoConfigDefaults = require("./lib/repoConfigDefaults");
 const repoConfigOverrides = require("./lib/repoConfigOverrides");
 const systemQueues = require("./lib/systemQueues");
+const repositoryBuilds = require("./lib/repositoryBuilds");
 
 // Public functions
 
@@ -24,6 +25,7 @@ function startCache(conf) {
   repoConfigDefaults.setClient(client);
   repoConfigOverrides.setClient(client);
   systemQueues.setClient(client);
+  repositoryBuilds.setClient(client);
 }
 
 /**
