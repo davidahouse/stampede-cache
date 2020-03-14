@@ -18,10 +18,9 @@ const admin = require("./lib/admin");
 /**
  * startCache
  * @param {*} conf
- * @param {*} logger
  */
-function startCache(conf, logger) {
-  client.createRedisClient(conf, logger);
+function startCache(conf) {
+  client.createRedisClient(conf);
   orgConfigDefaults.setClient(client);
   orgConfigOverrides.setClient(client);
   repoConfigDefaults.setClient(client);
