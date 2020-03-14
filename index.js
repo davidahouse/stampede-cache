@@ -391,3 +391,4 @@ module.exports.repoConfigDefaults = repoConfigDefaults;
 module.exports.repoConfigOverrides = repoConfigOverrides;
 module.exports.systemQueues = systemQueues;
 module.exports.repositoryBuilds = repositoryBuilds;
+module.exports.admin = admin;
