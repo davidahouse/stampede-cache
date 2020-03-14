@@ -17,9 +17,10 @@ const repositoryBuilds = require("./lib/repositoryBuilds");
 /**
  * startCache
  * @param {*} conf
+ * @param {*} logger
  */
-function startCache(conf) {
-  client.createRedisClient(conf);
+function startCache(conf, logger) {
+  client.createRedisClient(conf, logger);
   orgConfigDefaults.setClient(client);
   orgConfigOverrides.setClient(client);
   repoConfigDefaults.setClient(client);
