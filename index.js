@@ -9,6 +9,7 @@ const repoConfigDefaults = require("./lib/repoConfigDefaults");
 const repoConfigOverrides = require("./lib/repoConfigOverrides");
 const systemQueues = require("./lib/systemQueues");
 const repositoryBuilds = require("./lib/repositoryBuilds");
+const admin = require("./lib/admin");
 
 // Public functions
 
@@ -27,6 +28,7 @@ function startCache(conf, logger) {
   repoConfigOverrides.setClient(client);
   systemQueues.setClient(client);
   repositoryBuilds.setClient(client);
+  admin.setClient(client);
 }
 
 /**
@@ -389,3 +391,4 @@ module.exports.repoConfigDefaults = repoConfigDefaults;
 module.exports.repoConfigOverrides = repoConfigOverrides;
 module.exports.systemQueues = systemQueues;
 module.exports.repositoryBuilds = repositoryBuilds;
+module.exports.admin = admin;
