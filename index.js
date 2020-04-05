@@ -337,6 +337,30 @@ async function fetchActiveWorkers() {
   return activeWorkers;
 }
 
+/**
+ * fetchOwners
+ */
+async function fetchOwners() {
+  const owners = await client.fetchMembers("stampede-owners");
+  return owners;
+}
+
+/**
+ * removeOwner
+ * @param {*} owner
+ */
+async function removeOwner(owner) {
+  await client.removeMember("stampede-owners", owner);
+}
+
+/**
+ * addOwner
+ * @param {*} owner
+ */
+async function addOwner(owner) {
+  await client.add("stampede-owners", owner);
+}
+
 // Private functions
 
 // General
@@ -382,6 +406,11 @@ module.exports.removePendingList = removePendingList;
 // Heartbeat
 module.exports.storeWorkerHeartbeat = storeWorkerHeartbeat;
 module.exports.fetchActiveWorkers = fetchActiveWorkers;
+
+// Owners
+module.exports.fetchOwners = fetchOwners;
+module.exports.removeOwner = removeOwner;
+module.exports.addOwner = addOwner;
 
 // Modules
 module.exports.orgConfigDefaults = orgConfigDefaults;
